@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://yoursite.com/2017/03/07/commonjs/</loc>
+    <lastmod>2019-04-09</lastmod>
+  </url>  <url>
     <loc>http://yoursite.com/2019/04/02/hello-world/</loc>
     <lastmod>2019-04-02</lastmod>
-  </url>  <url>
-    <loc>http://yoursite.com/2017/06/25/css-hack/</loc>
-    <lastmod>2018-10-20</lastmod>
-  </url>  <url>
-    <loc>http://yoursite.com/2017/03/20/amd-cmd/</loc>
-    <lastmod>2018-10-20</lastmod>
   </url>  <url>
     <loc>http://yoursite.com/2016/11/18/china-javascript-environment/</loc>
     <lastmod>2018-10-20</lastmod>
   </url>  <url>
-    <loc>http://yoursite.com/2017/03/07/commonjs/</loc>
+    <loc>http://yoursite.com/2017/06/25/css-hack/</loc>
     <lastmod>2018-10-20</lastmod>
   </url>  <url>
     <loc>http://yoursite.com/2016/10/07/git/</loc>
     <lastmod>2018-10-20</lastmod>
   </url>  <url>
     <loc>http://yoursite.com/2016/09/25/essay-20160925/</loc>
+    <lastmod>2018-10-20</lastmod>
+  </url>  <url>
+    <loc>http://yoursite.com/2017/03/20/amd-cmd/</loc>
     <lastmod>2018-10-20</lastmod>
   </url>  <url>
     <loc>http://yoursite.com/2017/05/01/gulp/</loc>
