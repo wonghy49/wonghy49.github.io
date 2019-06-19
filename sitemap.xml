@@ -233,7 +233,21 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/2017/06/25/css-hack/</loc>
+    
+    <lastmod>2018-10-20T07:46:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2016/10/07/git/</loc>
+    
+    <lastmod>2018-10-20T07:46:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2017/05/01/gulp/</loc>
     
     <lastmod>2018-10-20T07:46:51.000Z</lastmod>
     
@@ -248,20 +262,6 @@
   
   <url>
     <loc>http://yoursite.com/2017/03/20/amd-cmd/</loc>
-    
-    <lastmod>2018-10-20T07:46:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2017/06/25/css-hack/</loc>
-    
-    <lastmod>2018-10-20T07:46:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2017/05/01/gulp/</loc>
     
     <lastmod>2018-10-20T07:46:51.000Z</lastmod>
     
