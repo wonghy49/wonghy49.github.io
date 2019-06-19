@@ -7,7 +7,7 @@ title: Hexo
 subtitle:
 description:
 keywords:
-author: John Doe
+author: Huayan Wong
 language: zh-CN
 timezone:
 
@@ -111,12 +111,21 @@ live2d:
   enable: true
   scriptFrom: local
   model:
+    scale: 1
+    hHeadPos: 0.5
+    vHeadPos: 0.618
     use: live2d-widget-model-hijiki #模型选择
   display:
+    superSample: 2
     position: right #模型位置
-    width: 150       #模型宽度
+    width: 150       #模型宽度#
     height: 300      #模型高度
+    hOffset: 10
+    vOffset: -20
   mobile:
-    show: false      #是否在手机端显示
+    show: true      #是否在手机端显示
+    scale: 0.5
   react:
-    opacity: 50
+    #opacityDefault: 0.7
+    #opacityOnHover: 0.2
+    opacity: 0.5

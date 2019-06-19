@@ -3,7 +3,8 @@ title: CommonJS 详细介绍
 date: 2017-03-07 13:25:24
 categories: 前端
 tags: [JavaScript]
-comments: false
+comments: true
+toc: true
 ---
 
 ## CommonJS 规范与实现
