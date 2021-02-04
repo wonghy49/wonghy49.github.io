@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/angular.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/package.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/app.component.spec.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/app.component.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/app.module.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/index/index.component.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/index/index.component.scss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/index/index.component.spec.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/index/index.component.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/login/login.component.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/login/login.component.spec.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/login/login.component.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/petsDetail/petsDetail.component.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/petsDetail/petsDetail.component.scss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/petsDetail/petsDetail.component.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/app/test/test.component.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../practice/frontend-huanghuayan-practice-petsMgtSys/src/styles.css" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

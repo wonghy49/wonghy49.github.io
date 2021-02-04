@@ -7,6 +7,9 @@ comments: true
 toc: true
 ---
 
+
+
+
 # 一、简介
 
 - 提供服务端和客户端支持
@@ -125,7 +128,14 @@ public class ConfigServerApplication {
 
 ### 1、添加依赖
 
-同样需要添加同服务端的依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+```
+
+
 
 ### 2、配置文件
 

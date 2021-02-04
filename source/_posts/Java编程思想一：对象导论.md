@@ -1,3 +1,12 @@
+---
+title: 对象导论
+date: 2019-08-21 16:43:24
+categories: Java编程思想
+tags: [Java编程思想]
+comments: true
+toc: true
+---
+
 # 纯粹的面向对象程序设计方式
 
 1. ## 万物皆为对象

@@ -24,9 +24,9 @@ toc: true
 - 防止单个服务的故障耗尽整个服务的Servlet 容器（例如Tomcat ）的线程资源。
 - 快速失败机制，如果某个服务出现了故障，则调用该服务的请求快速失败，而不是线
   程等待。
-- 提供回退（ fallback ）方案，在请求发生故障时，提供设定好的回退方案。
-- 使用熔断机制，防止故障扩散到其他服务。
-- 提供熔断器的监控组件Hystrix Dashboard，可以实时监控熔断器的状态。
+- 提供**回退（ fallback ）**方案，在请求发生故障时，提供设定好的回退方案。
+- 使用**熔断机制**，防止故障扩散到其他服务。
+- 提供熔断器的监控组件**Hystrix Dashboard**，可以实时监控熔断器的状态。
 
 #### 工作机制
 
@@ -93,7 +93,67 @@ toc: true
 - 依赖的服务出现配置错误的时候，线程池会快速反映出问题
 - 每个专有线程池提供内置的并发实现
 
-#### Hystrix接口和注解
+#### 在ribbon使用断路器
+
+```xml
+    <dependency>
+          <groupId>org.springframework.cloud</groupId>
+          <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+    </dependency>
+```
+
+```java
+@EnableEurekaClient
+@EnableHystrix
+@SpringBootApplication
+public class EurekaClientRibbonApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaClientRibbonApplication.class, args);
+    }
+
+}
+```
+
+```java
+	@RequestMapping("getBook")
+    @HystrixCommand(fallbackMethod = "getBookError")
+    public String getBook(@RequestParam String name) {
+        logger.info("name:", name);
+        return restTemplate.getForObject("http://eureka-client/getBook?name="+name,String.class);
+    }
+
+    public String getBookError(String name) {
+        return "The name of the book is " + name + ", get Book Error!!";
+    }
+```
+
+#### 在Feign使用断路器
+
+Feign是自带断路器的，在D版本的Spring Cloud中，它没有默认打开。需要在配置文件中配置打开它，在配置文件加以下代码：
+
+> feign.hystrix.enabled=true
+
+@FeignClient中加入fallback，fallback引用的方法是继承了该接口的实现类
+
+```java
+@FeignClient(value = "eureka-client", fallback = BookFeignHystrixServiceImpl.class)
+public interface BookFeignService {
+
+    //此类中的方法和远程服务中contoller(即跟服务eureka-client)中的方法名和参数需保持一致
+    @RequestMapping("getBook")
+    public String getBook1(@RequestParam String name);
+}
+
+@Component
+public class BookFeignHystrixServiceImpl implements BookFeignService{
+
+    @Override
+    public String getBook1(String name) {
+        return "sorry, get book name:" + name;
+    }
+}
+```
 
 
 
@@ -111,7 +171,7 @@ toc: true
 
 如果是监控多个集群应用，方法有点不一样，主要是消费者的配置文件要加点东西。跟着我看一下吧
 
-turbine配置文件：
+**turbine配置文件**：
 
 ```yaml
 turbine:
@@ -129,6 +189,31 @@ turbine:
 instance:
 	metadata-map:
 		cluster: mycluster
+```
+
+**ribbon和Feign配置**
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+</dependency>
+```
+新版本的Spring Cloud 因为没有该/hystrix.stream的访问路径，所以需要配置一下
+
+```java
+@Configuration
+public class ServletConfig {
+    @Bean
+    public ServletRegistrationBean getServlet() {
+        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.addUrlMappings("/hystrix.stream");
+        registrationBean.setName("HystrixMetricsStreamServlet");
+        return registrationBean;
+    }
+}
 ```
 
 
@@ -162,13 +247,13 @@ instance:
     instanceUrlSuffix: /hystrix.stream
   ```
 
-  aggregator.cluster-config：指定聚合哪些集群，多个使用","分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
-
-  app-config：需要收集监控信息的服务名
-
-  cluster-name-expression：指定集群名称为default，如果为default时，turbine.aggregator.clusterConfig可以不写，因为默认就是default
-
-  combine-host-port：设置为true，可以让一台主机上的服务通过主机名和端口号组合来区分。默认是通过host来区分不同的服务的。
+  > aggregator.cluster-config：指定聚合哪些集群，多个使用","分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
+>
+  > app-config：需要收集监控信息的服务名
+>
+  > cluster-name-expression：指定集群名称为default，如果为default时，turbine.aggregator.clusterConfig可以不写，因为默认就是default
+>
+  > combine-host-port：设置为true，可以让一台主机上的服务通过主机名和端口号组合来区分。默认是通过host来区分不同的服务的。
 
 - 启动Turbine
 

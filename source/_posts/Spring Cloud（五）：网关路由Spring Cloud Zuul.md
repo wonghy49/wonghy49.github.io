@@ -9,7 +9,7 @@ toc: true
 
 # 一、什么是Spring Cloud Zuul？
 
-Zuul作为路由网关组件，将所有服务的API接口统一聚合，并且一起对外暴露。（路由转发和过滤器）外界不用知道内部的各个服务相互调用的复杂性，从而保护了内部微服务单元的API接口，防止被外界直接调用，导致服务的敏感信息暴露。Zuul是Netflix出品的一个基于JVM路由和服务端的负载均衡器
+Zuul作为路由网关组件，将所有服务的API接口统一聚合，并且一起对外暴露。（路由转发和过滤器）外界不用知道内部的各个服务相互调用的复杂性，从而保护了内部微服务单元的API接口，防止被外界直接调用，导致服务的敏感信息暴露。Zuul是Netflix出品的一个基于JVM路由和服务端的负载均衡器，zuul默认和Ribbon结合实现了负载均衡的功能
 
 ![](https://note.youdao.com/yws/api/personal/file/A987B794E9974665AE54954733F623B7?method=download&shareKey=a7ab1832575b4659f6b5fb8a98ce65f7)
 
@@ -58,7 +58,7 @@ zuul:
   routes:
     hiapi:  #自己定义的
       path: /hiapi/**    #就可以将指定类型的请求Uri 路由到指定的Serviceld
-      serviceid: eureka-client
+      serviceid: eureka-client #指定的ServiceId（zuul交给EureKa管理了）
     ribbonapi:
       path: /ribbonapi/**
       serviceid: eureka-ribbon-client
@@ -83,13 +83,17 @@ public class ApiGatewayApplication {
 
 ## 4.3、网关的默认路由规则
 
-Zuul的路由的默认规则为：`http://ZUUL_HOST:ZUUL_PORT/微服务在Eureka上的serviceId/**`，会被转发到serviceId对应的服务
+Zuul的路由的默认规则为：`http://ZUUL_HOST:ZUUL_PORT/微服务在Eureka上的serviceId/**`，会被转发到serviceId对应的服务，所以无需配置application.xml的信息一样可以访问
+
+## 4.4、如何达到负载均衡
+
+> 模拟服务集群，负责某个producer项目，改名为producer-2，修改producer-2的端口（应用名不用改），controller中的RequstMapping方法一样，再次调用zuul的网关接口，可以发现依次返回两个消费者，做了负载均衡
 
 # 五、服务过滤
 
 Filter是Zuul的核心，用来实现对外服务的控制。Filter的生命周期有4个，分别是“PRE”、“ROUTING”、“POST”、“ERROR”，整个生命周期可以用下图来表示。
 
-- **PRE：** 这种过滤器在请求被路由之前调用。我们可利用这种过滤器实现身份验证、在集群中选择请求的微服务、记录调试信息等。
+- **PRE：** 这种过滤器在请求被路由之前调用。我们可利用这种过滤器实现**身份验证**、在集群中选择请求的微服务、记录调试信息等。
 - **ROUTING：**这种过滤器将请求路由到微服务。这种过滤器用于构建发送给微服务的请求，并使用Apache HttpClient或Netfilx Ribbon请求微服务。
 - **POST：**这种过滤器在路由到微服务以后执行。这种过滤器可用来为响应添加标准的HTTP Header、收集统计信息和指标、将响应从微服务发送给客户端等。
 - **ERROR：**在其他阶段发生错误时执行该过滤器。 除了默认的过滤器类型，Zuul还允许我们创建自定义的过滤器类型。例如，我们可以定制一种STATIC类型的过滤器，直接在Zuul中生成响应，而不将请求转发到后端的微服务。
@@ -139,7 +143,7 @@ public class MyFilter extends ZuulFilter {
         return "pre";
     }
 	
-    //filterOrder：过滤的顺序
+    //filterOrder：过滤的顺序，数字越小表示顺序越高，越先执行
     @Override
     public int filterOrder() {
         return 0;
@@ -160,7 +164,7 @@ public class MyFilter extends ZuulFilter {
         Object accessToken = request.getParameter("token");
         if(accessToken == null) {
             log.warn("token is empty");
-            ctx.setSendZuulResponse(false);
+            ctx.setSendZuulResponse(false);//对请求不进行路由
             ctx.setResponseStatusCode(401);
             try {
                 ctx.getResponse().getWriter().write("token is empty");
@@ -175,4 +179,127 @@ public class MyFilter extends ZuulFilter {
 
 ```
 
-5.2、
+将MyFilter加入到请求拦截队列，在启动类添加
+
+```java
+@Bean
+public MyFilter myFilter() {
+	return new MyFilter();
+}
+
+```
+
+## 5.3、路由熔断
+
+当某个服务出现异常（没有启动，或者调用超时）将服务自动进行降级，直接返回我们预设的信息
+
+需要自定义的fallback方法，指定给某个route来实现该router访问出现问题的熔断处理。
+
+**旧版**：继承**ZuulFallbackProvider**接口来实现，有**getRoute和fallbackResponse**两个方法，getRoute方法指明要熔断拦截哪个服务，fallbackResponse方法定制返回值
+
+**新版**：Spring扩展此类，丰富返回方式，在返回的内容中添加了异常信息，建议直接继承**FallbackProvider**
+
+```java
+@Component
+public class ProducerFallback implements FallbackProvider {
+    private final Logger logger = LoggerFactory.getLogger(FallbackProvider.class);
+
+    //指定要处理的 service。
+    @Override
+    public String getRoute() {
+        return "spring-cloud-producer";
+    }
+
+    public ClientHttpResponse fallbackResponse() {
+        return new ClientHttpResponse() {
+            @Override
+            public HttpStatus getStatusCode() throws IOException {
+                return HttpStatus.OK;
+            }
+
+            @Override
+            public int getRawStatusCode() throws IOException {
+                return 200;
+            }
+
+            @Override
+            public String getStatusText() throws IOException {
+                return "OK";
+            }
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public InputStream getBody() throws IOException {
+                return new ByteArrayInputStream("The service is unavailable.".getBytes());
+            }
+
+            @Override
+            public HttpHeaders getHeaders() {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                return headers;
+            }
+        };
+    }
+}
+```
+
+## 5.4、路由重试
+
+因为网络或者其它原因，服务可能会暂时的不可用，这个时候我们希望可以再次对服务进行重试，Zuul也帮我们实现了此功能，需要结合Spring Retry 一起来实现
+
+**zuul项目中的pom.xml**
+
+```xml
+<dependency>
+	<groupId>org.springframework.retry</groupId>
+	<artifactId>spring-retry</artifactId>
+</dependency>
+
+```
+
+**开启Zuul Retry**
+
+```yml
+#是否开启重试功能
+zuul:
+	retryable: true
+ribbon:
+	#对当前服务的重试次数(除去首次)
+	MaxAutoRetries: 2
+	#切换相同Server的次数(除去首次)
+	MaxAutoRetriesNextServer: 0
+
+```
+
+**测试**
+
+```java
+@RequestMapping("/hello")
+public String index(@RequestParam String name) {
+    logger.info("request two name is "+name);
+    try{
+        Thread.sleep(1000000);
+    }catch ( Exception e){
+        logger.error(" hello two error",e);
+    }
+    return "hello "+name+"，this is two messge";
+}
+
+```
+
+**控制台信息**
+
+```
+2018-01-22 19:50:32.401  INFO 19488 --- [io-9001-exec-14] o.s.c.n.z.f.route.FallbackProvider       : request two name is neo
+2018-01-22 19:50:33.402  INFO 19488 --- [io-9001-exec-15] o.s.c.n.z.f.route.FallbackProvider       : request two name is neo
+2018-01-22 19:50:34.404  INFO 19488 --- [io-9001-exec-16] o.s.c.n.z.f.route.FallbackProvider       : request two name is neo
+```
+
+说明进行三次请求，也就是进行两次重试了
+
+## 5.5、Zuul高可用
